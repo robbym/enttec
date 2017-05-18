@@ -1,0 +1,8 @@
+[package]
+name = "enttec"
+version = "0.1.0"
+authors = ["Robby Madruga <rmadruga@illumtechnology.com>"]
+
+[dependencies]
+bytes = "0.4.3"
+serial = "0.3"
