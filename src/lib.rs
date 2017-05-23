@@ -75,7 +75,7 @@ trait EnttecPacket: TryFrom<Bytes, Err = EnttecError> + Into<Bytes> {
         &bytes[4..bytes.len() - 1]
     }
 
-    fn size() -> usize;
+    fn size(&self) -> usize;
 }
 
 struct GetParameters {
@@ -129,12 +129,12 @@ impl TryFrom<Bytes> for GetParametersReply {
             Ok(frame) => {
                 let slice = Self::frame_data(&frame);
                 Ok(GetParametersReply {
-                    firm_lsb: slice[0],
-                    firm_msb: slice[1],
-                    dmx_break: slice[2],
-                    dmx_mab: slice[3],
-                    dmx_rate: slice[4],
-                })
+                       firm_lsb: slice[0],
+                       firm_msb: slice[1],
+                       dmx_break: slice[2],
+                       dmx_mab: slice[3],
+                       dmx_rate: slice[4],
+                   })
             }
             Err(e) => Err(e),
         }
@@ -220,16 +220,19 @@ impl<T> EnttecWidget for T where T: SerialPort {}
 fn it_works() {
     let mut widget = serial::open("COM3").unwrap();
 
-    widget.set_timeout(std::time::Duration::from_secs(1)).unwrap();
+    widget
+        .set_timeout(std::time::Duration::from_secs(1))
+        .unwrap();
 
-    widget.reconfigure(&|settings| {
-            try!(settings.set_baud_rate(serial::Baud9600));
-            settings.set_char_size(serial::Bits8);
-            settings.set_parity(serial::ParityNone);
-            settings.set_stop_bits(serial::Stop1);
-            settings.set_flow_control(serial::FlowNone);
-            Ok(())
-        })
+    widget
+        .reconfigure(&|settings| {
+                         try!(settings.set_baud_rate(serial::Baud9600));
+                         settings.set_char_size(serial::Bits8);
+                         settings.set_parity(serial::ParityNone);
+                         settings.set_stop_bits(serial::Stop1);
+                         settings.set_flow_control(serial::FlowNone);
+                         Ok(())
+                     })
         .unwrap();
 
     let res: GetParametersReply = widget.send_packet(GetParameters { param_size: 0 }).unwrap();
